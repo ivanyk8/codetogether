@@ -1,0 +1,6 @@
+Django>=5.0
+djangorestframework
+drf-spectacular
+django-ratelimit
+bcrypt
+django-environ
