@@ -1,0 +1,176 @@
+{% load static %}
+<!doctype html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>CodeTogether - Авторизация</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="{% static 'users/css/style.css' %}?v={% now 'U' %}" />
+    </head>
+    <body class="auth-page" 
+          data-theme="{{ user.profile.theme|default:'default' }}">
+        <div class="animated-mesh"></div>
+        <div class="container">
+            {% block content %}
+            {% if form_type == 'login' %}
+            <div id="login-card" class="card">
+                <h2>Вход в систему</h2>
+                <form method="post" action="{% url 'login' %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="login-username">Логин</label>
+                        <input type="text" name="username" id="login-username" placeholder="Ваш логин" required />
+                    </div>
+                    <div class="form-group password-wrapper">
+                        <label for="login-password">Пароль</label>
+                        <div class="input-with-icon">
+                            <input
+                                type="password"
+                                name="password"
+                                id="login-password"
+                                placeholder="Ваш пароль"
+                                required
+                            />
+                            <button type="button" class="toggle-password-btn" onclick="togglePassword('login-password')" aria-label="Показать пароль">
+                                <i class="fa-solid fa-eye eye-icon"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 2rem; text-align: right;">
+                        <a href="{% url 'password_reset' %}" class="forgot-password-link" style="color: var(--text-secondary); font-size: 0.85rem; text-decoration: none; opacity: 0.8; transition: 0.3s;">Забыли пароль?</a>
+                    </div>
+                    <button type="submit" class="primary" style="width: 100%">Войти в аккаунт</button>
+                </form>
+                
+                {% if messages %}
+                    <div class="messages-container" style="margin-top: 2rem;">
+                        {% for message in messages %}
+                            <div class="alert {{ message.tags }} animate-fade-in" style="background: rgba(239, 68, 68, 0.1); color: var(--danger-color); padding: 1.25rem; border-radius: 16px; font-size: 0.95rem; border: 1px solid rgba(239, 68, 68, 0.2); display: flex; align-items: center; gap: 0.75rem;">
+                                <i class="fa-solid fa-circle-exclamation"></i> {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <div style="margin-top: 2rem; text-align: center; border-top: 1px solid var(--border-color); padding-top: 2rem;">
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">Нет аккаунта?</p>
+                    <a href="{% url 'register' %}" class="btn secondary" style="width: 100%">Создать новый аккаунт</a>
+                </div>
+            </div>
+
+            {% elif form_type == 'register' %}
+            <div id="register-card" class="card">
+                <h2>Регистрация</h2>
+                <form method="post" action="{% url 'register' %}" id="reg-form">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="reg-username">Имя пользователя</label>
+                        <input type="text" name="username" id="reg-username" placeholder="Придумайте логин" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-email">Email</label>
+                        <input type="email" name="email" id="reg-email" placeholder="example@mail.com" required />
+                    </div>
+                    <div class="form-group password-wrapper">
+                        <label for="reg-password1">Пароль</label>
+                        <div class="input-with-icon">
+                            <input
+                                type="password"
+                                name="password1"
+                                id="reg-password1"
+                                placeholder="Надежный пароль"
+                                oninput="checkPasswordStrength(this.value)"
+                                required
+                            />
+                            <button type="button" class="toggle-password-btn" onclick="togglePassword('reg-password1')" aria-label="Показать пароль">
+                                <i class="fa-solid fa-eye eye-icon"></i>
+                            </button>
+                        </div>
+                        <div id="password-strength" class="strength-meter">
+                            <div class="strength-bar"></div>
+                        </div>
+                        <span class="strength-text"></span>
+                    </div>
+                    <div class="form-group password-wrapper" style="margin-bottom: 2.5rem;">
+                        <label for="reg-password2">Повторите пароль</label>
+                        <div class="input-with-icon">
+                            <input
+                                type="password"
+                                name="password2"
+                                id="reg-password2"
+                                placeholder="Пароль еще раз"
+                                required
+                            />
+                            <button type="button" class="toggle-password-btn" onclick="togglePassword('reg-password2')" aria-label="Показать пароль">
+                                <i class="fa-solid fa-eye eye-icon"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="submit" class="primary" style="width: 100%">Создать аккаунт</button>
+                </form>
+
+                {% if messages %}
+                    <div class="messages-container" style="margin-top: 2rem;">
+                        {% for message in messages %}
+                            <div class="alert {{ message.tags }} animate-fade-in" style="background: rgba(239, 68, 68, 0.1); color: var(--danger-color); padding: 1.25rem; border-radius: 16px; font-size: 0.95rem; border: 1px solid rgba(239, 68, 68, 0.2); display: flex; align-items: center; gap: 0.75rem;">
+                                <i class="fa-solid fa-circle-exclamation"></i> {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <div style="margin-top: 2rem; text-align: center; border-top: 1px solid var(--border-color); padding-top: 2rem;">
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">Уже зарегистрированы?</p>
+                    <a href="{% url 'login' %}" class="btn secondary" style="width: 100%">Войти в систему</a>
+                </div>
+            </div>
+            {% endif %}
+            {% endblock %}
+        </div>
+        <script>
+            function togglePassword(inputId) {
+                const input = document.getElementById(inputId);
+                const btn = input.nextElementSibling;
+                const icon = btn.querySelector('.eye-icon');
+                
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+                } else {
+                    input.type = 'password';
+                    icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+                }
+            }
+
+            function checkPasswordStrength(password) {
+                const meter = document.querySelector('.strength-bar');
+                const text = document.querySelector('.strength-text');
+                let strength = 0;
+                
+                if (password.length > 5) strength++;
+                if (password.length > 8) strength++;
+                if (/[A-Z]/.test(password)) strength++;
+                if (/[0-9]/.test(password)) strength++;
+                if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+                const colors = ['#f44336', '#ff9800', '#ffc107', '#8bc34a', '#4caf50'];
+                const labels = ['Очень слабый', 'Слабый', 'Средний', 'Хороший', 'Сильный'];
+                
+                if (password.length === 0) {
+                    meter.style.width = '0';
+                    text.textContent = '';
+                } else {
+                    meter.style.width = (strength + 1) * 20 + '%';
+                    meter.style.backgroundColor = colors[strength];
+                    text.textContent = labels[strength];
+                    text.style.color = colors[strength];
+                }
+            }
+        </script>
+        <script src="{% static 'users/js/main.js' %}"></script>
+    </body>
+</html>

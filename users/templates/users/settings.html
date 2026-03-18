@@ -1,0 +1,110 @@
+{% extends "users/auth.html" %}
+{% load static %}
+
+{% block content %}
+<div class="card" style="max-width: 500px;">
+    <div style="width: 64px; height: 64px; background: rgba(139, 92, 246, 0.1); border-radius: 20px; display: flex; align-items: center; justify-content: center; color: var(--accent-color); font-size: 1.75rem; margin: 0 auto 1.5rem;">
+        <i class="fa-solid fa-sliders"></i>
+    </div>
+    <h2>Настройки</h2>
+    <p>Управление профилем и внешним видом сайта</p>
+
+    <!-- Смена темы -->
+    <div style="text-align: left; margin-bottom: 2.5rem; padding: 1.5rem; background: rgba(255,255,255,0.03); border-radius: 24px; border: 1px solid var(--border-color);">
+        <h3 style="font-size: 1rem; margin-bottom: 1rem; color: var(--text-primary);">Цветовая палитра</h3>
+        <form action="{% url 'settings' %}" method="post" id="theme-form" style="display: flex; gap: 12px; justify-content: space-between;">
+            {% csrf_token %}
+            <input type="hidden" name="theme" id="theme-input">
+            <div onclick="setTheme('default')" class="theme-circle {% if profile.theme == 'default' %}active{% endif %}" style="background: #8b5cf6;" title="Фиолетовый"></div>
+            <div onclick="setTheme('ocean')" class="theme-circle {% if profile.theme == 'ocean' %}active{% endif %}" style="background: #0ea5e9;" title="Океан"></div>
+            <div onclick="setTheme('forest')" class="theme-circle {% if profile.theme == 'forest' %}active{% endif %}" style="background: #10b981;" title="Лес"></div>
+            <div onclick="setTheme('sunset')" class="theme-circle {% if profile.theme == 'sunset' %}active{% endif %}" style="background: #f43f5e;" title="Закат"></div>
+            <div onclick="setTheme('midnight')" class="theme-circle {% if profile.theme == 'midnight' %}active{% endif %}" style="background: #6366f1;" title="Полночь"></div>
+        </form>
+    </div>
+
+    <!-- Смена пароля -->
+    <div style="text-align: left; padding: 1.5rem; background: rgba(255,255,255,0.03); border-radius: 24px; border: 1px solid var(--border-color);">
+        <h3 style="font-size: 1rem; margin-bottom: 1.5rem; color: var(--text-primary);">Безопасность</h3>
+        <form method="post" action="{% url 'settings' %}">
+            {% csrf_token %}
+            <div class="form-group password-wrapper">
+                <label for="id_old_password">Текущий пароль</label>
+                <div class="input-with-icon">
+                    <input type="password" name="old_password" id="id_old_password" required placeholder="Текущий пароль">
+                    <button type="button" class="toggle-password-btn" onclick="togglePassword('id_old_password')">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="form-group password-wrapper">
+                <label for="id_new_password1">Новый пароль</label>
+                <div class="input-with-icon">
+                    <input type="password" name="new_password1" id="id_new_password1" required placeholder="Новый пароль" oninput="checkPasswordStrength(this.value)">
+                    <button type="button" class="toggle-password-btn" onclick="togglePassword('id_new_password1')">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
+                <div id="password-strength" class="strength-meter"><div class="strength-bar"></div></div>
+            </div>
+            <div class="form-group password-wrapper" style="margin-bottom: 1.5rem;">
+                <label for="id_new_password2">Подтверждение</label>
+                <div class="input-with-icon">
+                    <input type="password" name="new_password2" id="id_new_password2" required placeholder="Повторите пароль">
+                    <button type="button" class="toggle-password-btn" onclick="togglePassword('id_new_password2')">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+            <button type="submit" class="primary" style="width: 100%;">Обновить пароль</button>
+        </form>
+    </div>
+
+    {% if messages %}
+        <div class="messages-container" style="margin-top: 1.5rem;">
+            {% for message in messages %}
+                <div class="alert {{ message.tags }} animate-fade-in" style="background: rgba(16, 185, 129, 0.1); color: var(--success-color); padding: 1rem; border-radius: 12px; border: 1px solid rgba(16, 185, 129, 0.2); display: flex; align-items: center; gap: 0.75rem;">
+                    <i class="fa-solid fa-circle-check"></i> {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div style="margin-top: 2rem; text-align: center; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
+        <a href="{% url 'dashboard' %}" class="btn secondary" style="width: 100%">
+            <i class="fa-solid fa-arrow-left"></i> Назад в дашборд
+        </a>
+    </div>
+</div>
+
+<style>
+    .theme-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 14px;
+        cursor: pointer;
+        transition: 0.3s;
+        border: 2px solid transparent;
+    }
+    .theme-circle:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+    .theme-circle.active {
+        border-color: white;
+        transform: scale(1.1);
+        box-shadow: 0 0 20px var(--accent-glow);
+    }
+</style>
+
+<script>
+    window.setTheme = function(theme) {
+        const input = document.getElementById('theme-input');
+        const form = document.getElementById('theme-form');
+        if (input && form) {
+            input.value = theme;
+            form.submit();
+        }
+    };
+</script>
+{% endblock %}

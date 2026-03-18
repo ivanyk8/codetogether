@@ -1,0 +1,76 @@
+{% load static %}
+<!doctype html>
+<html lang="ru">
+    <script src="{% static 'users/js/main.js' %}"></script>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>CodeTogether - Дашборд</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="{% static 'users/css/style.css' %}?v={% now 'U' %}" />
+    </head>
+    <body class="dashboard-page" 
+          data-theme="{{ profile.theme|default:'default' }}">
+        <div class="animated-mesh"></div>
+    <div class="dashboard-container">
+        <!-- Шапка -->
+        <header class="dashboard-header glass-panel">
+            <div class="user-profile-badge">
+                <div class="user-avatar" style="{% if profile.background_image %}border: 2px solid var(--accent-color){% endif %}">
+                    {{ user.username|slice:":1"|upper }}
+                </div>
+                <div class="user-info">
+                    <span class="user-name">{{ user.username }}</span>
+                    <span class="user-email">{{ user.email }}</span>
+                </div>
+            </div>
+            <div class="header-actions" style="display: flex; gap: 1rem;">
+                <a href="{% url 'settings' %}" class="btn secondary">
+                    <i class="fa-solid fa-sliders"></i> Настройки
+                </a>
+                <a href="{% url 'logout' %}" class="btn secondary">
+                    <i class="fa-solid fa-right-from-bracket"></i> Выйти
+                </a>
+            </div>
+        </header>
+
+        <!-- Действия с сессиями -->
+        <section class="dashboard-actions-section" style="margin-bottom: 4rem;">
+            <div class="glass-panel" style="padding: 3rem;">
+                <h2 style="margin-bottom: 2rem; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px;">Управление сессиями</h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <button class="btn primary" id="create-session-btn" style="width: 100%;">
+                        <i class="fa-solid fa-plus-circle"></i> Создать новую сессию
+                    </button>
+                    <div class="session-join-group" style="display: flex; gap: 0.75rem;">
+                        <input type="text" id="session-id-input" placeholder="Введите имя сессии для входа..." style="flex: 1;">
+                        <button class="btn secondary" id="join-session-btn">
+                            <i class="fa-solid fa-door-open"></i> Присоединиться
+                        </button>
+                    </div>
+                </div>
+                {% csrf_token %}
+            </div>
+        </section>
+
+        <!-- Список активных сессий -->
+        <section>
+            <h2 style="font-size: 1.25rem; color: var(--text-secondary); margin-bottom: 2rem; display: flex; align-items: center; gap: 0.75rem; font-weight: 700;">
+                <i class="fa-solid fa-folder-open" style="color: var(--accent-color)"></i> Ваши проекты
+            </h2>
+            <div class="session-list" id="session-list">
+                <div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 5rem; border: 2px dashed var(--border-color); border-radius: 32px; background: rgba(255,255,255,0.02);">
+                    <i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+                    Загрузка ваших сессий...
+                </div>
+            </div>
+        </section>
+    </div>
+
+        <script src="{% static 'users/js/modal.js' %}?v={% now 'U' %}"></script>
+        <script src="{% static 'users/js/main.js' %}?v={% now 'U' %}"></script>
+    </body>
+</html>
